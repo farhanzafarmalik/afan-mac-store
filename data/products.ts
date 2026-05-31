@@ -37,6 +37,20 @@ export interface Product {
   detailsSlug?: string;
   /** Reserved for real spec data — empty array until specs are available */
   specs?: string[];
+
+  // ── Phase 15B: Quick Details fields (safe — no price/stock/specs) ──────────
+  /** One or two honest sentences shown in the Quick Details drawer. */
+  detailSummary?: string;
+  /** 2–3 safe chips shown on the product card. */
+  detailBullets?: string[];
+  /** What the customer should confirm on WhatsApp — shown in the drawer. */
+  confirmationPoints?: string[];
+  /** Accessories only — compatibility note shown in the drawer. */
+  compatibilityNote?: string;
+  /** Devices only — condition availability note shown in the drawer. */
+  conditionNote?: string;
+  /** Devices only — one use-case tag e.g. "Work", "Study", "Office / Creator". */
+  bestFor?: string;
 }
 
 export const PRODUCTS: Product[] = [
@@ -53,6 +67,21 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in MacBook Pro. Please share current availability and details.",
     featured: true,
+    detailSummary:
+      "Pre-owned and refurbished MacBook Pro units available. All devices go through a physical inspection before listing.",
+    detailBullets: [
+      "Multiple conditions available",
+      "WhatsApp inquiry required",
+      "15-day checking warranty",
+    ],
+    confirmationPoints: [
+      "Current availability",
+      "Condition (e.g. Open Box, Refurbished, Used)",
+      "Price for selected condition",
+      "Warranty and checking period",
+    ],
+    conditionNote: "Available in multiple conditions — confirm via WhatsApp.",
+    bestFor: "Work",
   },
   {
     id: "macbook-air",
@@ -66,6 +95,21 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in MacBook Air. Please share current availability and details.",
     featured: true,
+    detailSummary:
+      "Pre-owned and refurbished MacBook Air units available. Lightweight and reliable — ideal for study and daily use.",
+    detailBullets: [
+      "Multiple conditions available",
+      "WhatsApp inquiry required",
+      "15-day checking warranty",
+    ],
+    confirmationPoints: [
+      "Current availability",
+      "Condition (e.g. Open Box, Refurbished, Used)",
+      "Price for selected condition",
+      "Warranty and checking period",
+    ],
+    conditionNote: "Available in multiple conditions — confirm via WhatsApp.",
+    bestFor: "Work / Study",
   },
 
   // ── iPhone ───────────────────────────────────────────────────────────────
@@ -81,6 +125,21 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in iPhone. Please share current availability and details.",
     featured: true,
+    detailSummary:
+      "Genuine iPhones available in multiple conditions. All units are physically checked before listing.",
+    detailBullets: [
+      "Multiple conditions available",
+      "WhatsApp inquiry required",
+      "15-day checking warranty",
+    ],
+    confirmationPoints: [
+      "Current availability",
+      "Condition (e.g. Open Box, Refurbished, Used)",
+      "Price for selected condition",
+      "Warranty and checking period",
+    ],
+    conditionNote: "Available in multiple conditions — confirm via WhatsApp.",
+    bestFor: "Daily use",
   },
 
   // ── iPad ─────────────────────────────────────────────────────────────────
@@ -96,6 +155,21 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in iPad. Please share current availability and details.",
     featured: true,
+    detailSummary:
+      "iPad units available in multiple conditions. Great for study, work, and creative tasks.",
+    detailBullets: [
+      "Multiple conditions available",
+      "WhatsApp inquiry required",
+      "15-day checking warranty",
+    ],
+    confirmationPoints: [
+      "Current availability",
+      "Condition (e.g. Open Box, Refurbished, Used)",
+      "Price for selected condition",
+      "Warranty and checking period",
+    ],
+    conditionNote: "Available in multiple conditions — confirm via WhatsApp.",
+    bestFor: "Study / Work",
   },
 
   // ── Mac mini ─────────────────────────────────────────────────────────────
@@ -111,6 +185,21 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in Mac mini. Please share current availability and details.",
     featured: true,
+    detailSummary:
+      "Pre-owned Mac mini units available. A compact and powerful desktop solution for home and office.",
+    detailBullets: [
+      "Multiple conditions available",
+      "WhatsApp inquiry required",
+      "15-day checking warranty",
+    ],
+    confirmationPoints: [
+      "Current availability",
+      "Condition (e.g. Open Box, Refurbished, Used)",
+      "Price for selected condition",
+      "Warranty and checking period",
+    ],
+    conditionNote: "Available in multiple conditions — confirm via WhatsApp.",
+    bestFor: "Office",
   },
 
   // ── iMac ─────────────────────────────────────────────────────────────────
@@ -126,6 +215,21 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in iMac. Please share current availability and details.",
     featured: false,
+    detailSummary:
+      "Pre-owned iMac units available. A capable all-in-one desktop for home, office, and creative work.",
+    detailBullets: [
+      "Multiple conditions available",
+      "WhatsApp inquiry required",
+      "15-day checking warranty",
+    ],
+    confirmationPoints: [
+      "Current availability",
+      "Condition (e.g. Open Box, Refurbished, Used)",
+      "Price for selected condition",
+      "Warranty and checking period",
+    ],
+    conditionNote: "Available in multiple conditions — confirm via WhatsApp.",
+    bestFor: "Office / Creator",
   },
 
   // ── Apple Watch ──────────────────────────────────────────────────────────
@@ -141,6 +245,21 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in Apple Watch. Please share current availability and details.",
     featured: true,
+    detailSummary:
+      "Genuine Apple Watch units available in multiple conditions. Confirm current model and condition on WhatsApp.",
+    detailBullets: [
+      "Multiple conditions available",
+      "WhatsApp inquiry required",
+      "15-day checking warranty",
+    ],
+    confirmationPoints: [
+      "Current availability",
+      "Condition (e.g. Open Box, Refurbished, Used)",
+      "Price for selected condition",
+      "Warranty and checking period",
+    ],
+    conditionNote: "Available in multiple conditions — confirm via WhatsApp.",
+    bestFor: "Daily use",
   },
 
   // ── AirPods ──────────────────────────────────────────────────────────────
@@ -156,6 +275,21 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in AirPods. Please share current availability and details.",
     featured: true,
+    detailSummary:
+      "Genuine AirPods available in multiple conditions. Confirm current model and availability on WhatsApp.",
+    detailBullets: [
+      "Multiple conditions available",
+      "WhatsApp inquiry required",
+      "15-day checking warranty",
+    ],
+    confirmationPoints: [
+      "Current availability",
+      "Condition (e.g. Open Box, Refurbished, Used)",
+      "Price for selected condition",
+      "Warranty and checking period",
+    ],
+    conditionNote: "Available in multiple conditions — confirm via WhatsApp.",
+    bestFor: "Daily use",
   },
 
   // ── Accessories (exactly 11 items) ───────────────────────────────────────
@@ -170,7 +304,20 @@ export const PRODUCTS: Product[] = [
     image: null,
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in the 20W USB-C iPhone Adapter. Please share current availability and details.",
-    featured: false,
+    featured: true,
+    detailSummary:
+      "Apple-compatible charging adapter available for order. Price and availability confirmed on WhatsApp before shipment.",
+    detailBullets: [
+      "Apple-device compatible",
+      "Price confirmed on WhatsApp",
+      "COD available after confirmation",
+    ],
+    confirmationPoints: [
+      "Current price",
+      "Stock availability",
+      "COD delivery details and coverage area",
+    ],
+    compatibilityNote: "Compatible with Apple devices.",
   },
   {
     id: "adapter-30w",
@@ -184,6 +331,19 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in the 30W USB-C iPhone Adapter. Please share current availability and details.",
     featured: false,
+    detailSummary:
+      "Apple-compatible charging adapter available for order. Price and availability confirmed on WhatsApp before shipment.",
+    detailBullets: [
+      "Apple-device compatible",
+      "Price confirmed on WhatsApp",
+      "COD available after confirmation",
+    ],
+    confirmationPoints: [
+      "Current price",
+      "Stock availability",
+      "COD delivery details and coverage area",
+    ],
+    compatibilityNote: "Compatible with Apple devices.",
   },
   {
     id: "adapter-45w",
@@ -197,6 +357,19 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in the 45W USB-C MacBook Adapter. Please share current availability and details.",
     featured: false,
+    detailSummary:
+      "Apple-compatible MacBook charging adapter available for order. Price and availability confirmed on WhatsApp before shipment.",
+    detailBullets: [
+      "Apple-device compatible",
+      "Price confirmed on WhatsApp",
+      "COD available after confirmation",
+    ],
+    confirmationPoints: [
+      "Current price",
+      "Stock availability",
+      "COD delivery details and coverage area",
+    ],
+    compatibilityNote: "Compatible with Apple devices.",
   },
   {
     id: "adapter-67w",
@@ -210,6 +383,19 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in the 67W USB-C MacBook Adapter. Please share current availability and details.",
     featured: false,
+    detailSummary:
+      "Apple-compatible MacBook charging adapter available for order. Price and availability confirmed on WhatsApp before shipment.",
+    detailBullets: [
+      "Apple-device compatible",
+      "Price confirmed on WhatsApp",
+      "COD available after confirmation",
+    ],
+    confirmationPoints: [
+      "Current price",
+      "Stock availability",
+      "COD delivery details and coverage area",
+    ],
+    compatibilityNote: "Compatible with Apple devices.",
   },
   {
     id: "adapter-96w",
@@ -223,6 +409,19 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in the 96W USB-C MacBook Adapter. Please share current availability and details.",
     featured: false,
+    detailSummary:
+      "Apple-compatible MacBook charging adapter available for order. Price and availability confirmed on WhatsApp before shipment.",
+    detailBullets: [
+      "Apple-device compatible",
+      "Price confirmed on WhatsApp",
+      "COD available after confirmation",
+    ],
+    confirmationPoints: [
+      "Current price",
+      "Stock availability",
+      "COD delivery details and coverage area",
+    ],
+    compatibilityNote: "Compatible with Apple devices.",
   },
   {
     id: "cable-usbc-usbc",
@@ -236,6 +435,19 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in the Braided USB-C to USB-C Cable. Please share current availability and details.",
     featured: false,
+    detailSummary:
+      "Apple-compatible braided cable available for order. Price and availability confirmed on WhatsApp before shipment.",
+    detailBullets: [
+      "Apple-device compatible",
+      "Price confirmed on WhatsApp",
+      "COD available after confirmation",
+    ],
+    confirmationPoints: [
+      "Current price",
+      "Stock availability",
+      "COD delivery details and coverage area",
+    ],
+    compatibilityNote: "Compatible with Apple devices.",
   },
   {
     id: "cable-usbc-lightning",
@@ -249,6 +461,19 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in the Braided USB-C to Lightning Cable. Please share current availability and details.",
     featured: false,
+    detailSummary:
+      "Apple-compatible braided cable available for order. Price and availability confirmed on WhatsApp before shipment.",
+    detailBullets: [
+      "Apple-device compatible",
+      "Price confirmed on WhatsApp",
+      "COD available after confirmation",
+    ],
+    confirmationPoints: [
+      "Current price",
+      "Stock availability",
+      "COD delivery details and coverage area",
+    ],
+    compatibilityNote: "Compatible with Apple devices.",
   },
   {
     id: "magsafe-charger",
@@ -262,6 +487,19 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in the MagSafe Charger. Please share current availability and details.",
     featured: false,
+    detailSummary:
+      "Apple-compatible MagSafe charger available for order. Price and availability confirmed on WhatsApp before shipment.",
+    detailBullets: [
+      "Apple-device compatible",
+      "Price confirmed on WhatsApp",
+      "COD available after confirmation",
+    ],
+    confirmationPoints: [
+      "Current price",
+      "Stock availability",
+      "COD delivery details and coverage area",
+    ],
+    compatibilityNote: "Compatible with iPhone (MagSafe-compatible models).",
   },
   {
     id: "macbook-sleeve",
@@ -275,6 +513,19 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in the MacBook Sleeve. Please share current availability and details.",
     featured: false,
+    detailSummary:
+      "Curated MacBook sleeve available for order. Price and availability confirmed on WhatsApp before shipment.",
+    detailBullets: [
+      "Apple-device compatible",
+      "Price confirmed on WhatsApp",
+      "COD available after confirmation",
+    ],
+    confirmationPoints: [
+      "Current price",
+      "Stock availability",
+      "COD delivery details and coverage area",
+    ],
+    compatibilityNote: "Compatible with MacBook models.",
   },
   {
     id: "macbook-case",
@@ -288,6 +539,19 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in the Hard Shell MacBook Case. Please share current availability and details.",
     featured: false,
+    detailSummary:
+      "Curated hard shell MacBook case available for order. Price and availability confirmed on WhatsApp before shipment.",
+    detailBullets: [
+      "Apple-device compatible",
+      "Price confirmed on WhatsApp",
+      "COD available after confirmation",
+    ],
+    confirmationPoints: [
+      "Current price",
+      "Stock availability",
+      "COD delivery details and coverage area",
+    ],
+    compatibilityNote: "Compatible with MacBook models.",
   },
   {
     id: "laptop-stand",
@@ -301,5 +565,18 @@ export const PRODUCTS: Product[] = [
     whatsappMessage:
       "Hi Afan Mac Store, I'm interested in the Foldable Laptop Stand. Please share current availability and details.",
     featured: false,
+    detailSummary:
+      "Curated foldable laptop stand available for order. Price and availability confirmed on WhatsApp before shipment.",
+    detailBullets: [
+      "Apple-device compatible",
+      "Price confirmed on WhatsApp",
+      "COD available after confirmation",
+    ],
+    confirmationPoints: [
+      "Current price",
+      "Stock availability",
+      "COD delivery details and coverage area",
+    ],
+    compatibilityNote: "Compatible with MacBook and other laptops.",
   },
 ];

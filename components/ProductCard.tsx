@@ -110,7 +110,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const [cardHovered, setCardHovered] = useState(false);
   const [addHovered, setAddHovered] = useState(false);
 
-  const { isSaved, toggleSaved, addToCart, openCartDrawer } = useShopActions();
+  const { isSaved, toggleSaved, addToCart, openCartDrawer, openDetailsDrawer } = useShopActions();
   const Icon = ICON_MAP[product.categorySlug] ?? Package;
   const saved = isSaved(product.id);
   const isAccessory = product.categorySlug === "accessories";
@@ -247,6 +247,8 @@ export default function ProductCard({ product }: { product: Product }) {
               lineHeight: 1.25,
               letterSpacing: "normal",
               margin: 0,
+              // Reserve 2 lines so cards align across the grid
+              minHeight: "calc(1.25 * 2 * 17px)", // = 42.5px ≈ 2 lines
             }}
           >
             {product.name}
@@ -269,9 +271,8 @@ export default function ProductCard({ product }: { product: Product }) {
           </span>
         </div>
 
-        {/* ── Short description ── */}
+        {/* ── Short description — minHeight ensures first line always visible, no clipping ── */}
         <p
-          className="line-clamp-2"
           style={{
             fontSize: 13,
             color: "#6E6E73",
@@ -279,11 +280,72 @@ export default function ProductCard({ product }: { product: Product }) {
             letterSpacing: "normal",
             wordSpacing: "normal",
             margin: 0,
-            flex: 1,
+            // Reserve 2 lines so grid rows stay aligned; overflow hidden prevents clipping
+            minHeight: "calc(1.5 * 2 * 13px)", // = 39px ≈ 2 lines
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
           }}
         >
           {product.shortDescription}
         </p>
+
+        {/* ── Detail bullets (max 2–3 safe chips) ── */}
+        {product.detailBullets && product.detailBullets.length > 0 && (
+          <ul
+            aria-label={`Key details for ${product.name}`}
+            style={{
+              listStyle: "none",
+              margin: 0,
+              padding: 0,
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 4,
+            }}
+          >
+            {product.detailBullets.slice(0, 3).map((bullet) => (
+              <li
+                key={bullet}
+                style={{
+                  fontSize: 11,
+                  color: "#6E6E73",
+                  background: "#F5F5F7",
+                  border: "1px solid #E8E8ED",
+                  borderRadius: 9999,
+                  padding: "2px 8px",
+                  lineHeight: 1.5,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {bullet}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {/* ── "Details" text trigger ── */}
+        <button
+          onClick={() => openDetailsDrawer(product)}
+          aria-label={`View quick details for ${product.name}`}
+          style={{
+            alignSelf: "flex-start",
+            background: "transparent",
+            border: "none",
+            padding: 0,
+            margin: 0,
+            cursor: "pointer",
+            fontSize: 12,
+            fontWeight: 500,
+            color: "#0071E3",
+            lineHeight: 1.4,
+            textDecoration: "none",
+            minHeight: 20,
+          }}
+          className="focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)] rounded hover:underline hover:[text-underline-offset:2px]"
+        >
+          Quick details →
+        </button>
 
         {/* ── Button row: Add to Inquiry/Cart + Ask on WhatsApp ── */}
         <div

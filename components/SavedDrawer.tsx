@@ -87,14 +87,7 @@ export default function SavedDrawer() {
     return () => document.removeEventListener("keydown", onKey);
   }, [isOpen, closeDrawers]);
 
-  // Lock body scroll
-  useEffect(() => {
-    if (isOpen) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
+  // Body scroll lock is managed centrally in ShopActionsContext.
 
   const waMessage = buildSavedMessage(savedItems);
   const hasItems = savedItems.length > 0;

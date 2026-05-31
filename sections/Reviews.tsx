@@ -129,7 +129,7 @@ export default function Reviews() {
       <section
         id="reviews"
         aria-labelledby="reviews-heading"
-        style={{ backgroundColor: "#F5F5F7" }}
+        style={{ backgroundColor: "#FFFFFF" }}
       >
         <div
           className="px-4 md:px-8"

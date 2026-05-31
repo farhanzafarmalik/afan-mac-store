@@ -65,7 +65,7 @@ function CategoryItem({
       <Link
         href={category.slug}
         aria-label={`Browse ${category.name}`}
-        className="flex flex-col items-center gap-[10px] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)] rounded-[6px]"
+        className="flex flex-col items-center gap-[10px] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)] rounded-[12px]"
         style={{ width: 96, textDecoration: "none" }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
@@ -203,7 +203,7 @@ export default function Categories() {
   return (
     <MotionConfig reducedMotion="user">
       <section
-        className="w-full bg-[#F5F5F7]"
+        className="w-full bg-[#FFFFFF]"
         style={{
           paddingTop: "clamp(64px, 8vw, 96px)",
           paddingBottom: "clamp(32px, 4vw, 48px)",

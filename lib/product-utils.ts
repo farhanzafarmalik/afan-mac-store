@@ -38,7 +38,7 @@ const CATEGORY_META: CategoryMeta[] = [
     slug: "iphone",
     name: "iPhone",
     h1: "iPhones at Afan Mac Store",
-    subtext: "Trusted iPhones, ready to use. Ask us for current options.",
+    subtext: "Trusted iPhones, ready to use. Message us for current availability.",
     whatsappMessage:
       "Hi Afan Mac Store, I'm looking for iPhone. Please share current options and availability.",
   },
@@ -54,7 +54,7 @@ const CATEGORY_META: CategoryMeta[] = [
     slug: "mac-mini",
     name: "Mac mini",
     h1: "Mac mini at Afan Mac Store",
-    subtext: "Compact desktop power. Message us for current stock.",
+    subtext: "Compact Apple desktop power. Message us for current availability.",
     whatsappMessage:
       "Hi Afan Mac Store, I'm looking for Mac mini. Please share current options and availability.",
   },
@@ -62,7 +62,7 @@ const CATEGORY_META: CategoryMeta[] = [
     slug: "imac",
     name: "iMac",
     h1: "iMacs at Afan Mac Store",
-    subtext: "All-in-one desktop. Message us to check availability.",
+    subtext: "All-in-one desktop power. Message us for current availability.",
     whatsappMessage:
       "Hi Afan Mac Store, I'm looking for iMac. Please share current options and availability.",
   },
@@ -70,7 +70,7 @@ const CATEGORY_META: CategoryMeta[] = [
     slug: "apple-watch",
     name: "Apple Watch",
     h1: "Apple Watch at Afan Mac Store",
-    subtext: "Smartwatches for daily use. Ask us for current options.",
+    subtext: "Apple Watches for daily use. Message us for current availability.",
     whatsappMessage:
       "Hi Afan Mac Store, I'm looking for Apple Watch. Please share current options and availability.",
   },
@@ -78,7 +78,7 @@ const CATEGORY_META: CategoryMeta[] = [
     slug: "airpods",
     name: "AirPods",
     h1: "AirPods at Afan Mac Store",
-    subtext: "Wireless audio, easy pairing. Message us for availability.",
+    subtext: "AirPods for everyday listening. Message us for current availability.",
     whatsappMessage:
       "Hi Afan Mac Store, I'm looking for AirPods. Please share current options and availability.",
   },
@@ -99,6 +99,11 @@ const CATEGORY_META: CategoryMeta[] = [
 /** Returns all 19 products — used by /products (All Products) page */
 export function getAllProducts(): Product[] {
   return PRODUCTS;
+}
+
+/** Returns products marked featured: true — used by the homepage Featured Products section */
+export function getFeaturedProducts(): Product[] {
+  return PRODUCTS.filter((p) => p.featured === true);
 }
 
 /**

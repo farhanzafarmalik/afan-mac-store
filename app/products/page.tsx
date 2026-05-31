@@ -6,6 +6,7 @@
 import type { Metadata } from "next";
 import { MessageCircle } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
+import ProductCategoryTabs from "@/components/ProductCategoryTabs";
 import { getAllProducts } from "@/lib/product-utils";
 import { whatsappLink } from "@/lib/constants";
 
@@ -41,7 +42,7 @@ export default function AllProductsPage() {
             Products
           </p>
 
-          {/* h1 */}
+          {/* h1 — minHeight reserves 2 lines so short titles don't pull the grid up */}
           <h1
             id="all-products-heading"
             className="font-semibold text-[#1D1D1F] leading-[1.08] tracking-[-0.02em]"
@@ -50,12 +51,15 @@ export default function AllProductsPage() {
               maxWidth: "640px",
               marginBottom: "12px",
               letterSpacing: "normal",
+              minHeight: "2.2em",
+              display: "flex",
+              alignItems: "flex-start",
             }}
           >
             All Products at Afan Mac Store
           </h1>
 
-          {/* Subtext */}
+          {/* Subtext — minHeight reserves 2 lines for consistent rhythm */}
           <p
             style={{
               fontSize: "clamp(1rem, 1.25vw + 0.125rem, 1.25rem)",
@@ -65,6 +69,7 @@ export default function AllProductsPage() {
               lineHeight: 1.5,
               letterSpacing: "normal",
               wordSpacing: "normal",
+              minHeight: "3.2em",
             }}
           >
             Browse MacBooks, iPhones, iPads, accessories, and more. Message us
@@ -90,12 +95,15 @@ export default function AllProductsPage() {
         </div>
       </section>
 
+      {/* ── Category tabs ── */}
+      <ProductCategoryTabs activeSlug={null} />
+
       {/* ── Product grid ── */}
       <section
         className="w-full bg-[#F5F5F7]"
         style={{
           paddingTop: "clamp(28px, 3.5vw, 48px)",
-          paddingBottom: "clamp(64px, 8vw, 96px)",
+          paddingBottom: "clamp(48px, 6vw, 72px)",
         }}
         aria-label="All products"
       >
@@ -104,6 +112,53 @@ export default function AllProductsPage() {
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
+          </div>
+
+          {/* ── End-of-grid WhatsApp prompt ── */}
+          <div
+            style={{
+              marginTop: "clamp(40px, 5vw, 56px)",
+              paddingTop: "clamp(32px, 4vw, 44px)",
+              borderTop: "1px solid #E8E8ED",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+              gap: 12,
+            }}
+          >
+            <p
+              style={{
+                fontSize: "clamp(1rem, 1.25vw + 0.125rem, 1.15rem)",
+                fontWeight: 600,
+                color: "#1D1D1F",
+                margin: 0,
+              }}
+            >
+              Didn&apos;t find what you&apos;re looking for?
+            </p>
+            <p
+              style={{
+                fontSize: "clamp(0.875rem, 1vw + 0.125rem, 1rem)",
+                color: "#6E6E73",
+                margin: 0,
+                maxWidth: "460px",
+                lineHeight: 1.5,
+              }}
+            >
+              Message us on WhatsApp and we&apos;ll help you find the right Apple product.
+            </p>
+            <a
+              href={whatsappLink("Hi Afan Mac Store, I couldn't find what I was looking for. Can you help me find the right Apple product?")}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Message Afan Mac Store on WhatsApp for product help"
+              className="inline-flex items-center gap-[6px] rounded-full min-h-[44px] px-6 text-[15px] font-semibold no-underline bg-[#25D366] text-white hover:bg-[#1DAE56] transition-colors duration-[180ms] ease focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)]"
+              style={{ marginTop: 4 }}
+            >
+              <MessageCircle size={16} aria-hidden="true" focusable="false" strokeWidth={2} />
+              Message on WhatsApp
+            </a>
           </div>
         </div>
       </section>

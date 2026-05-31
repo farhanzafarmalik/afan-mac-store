@@ -20,7 +20,7 @@ export default function Contact() {
     <section
       id="contact"
       aria-labelledby="contact-heading"
-      style={{ backgroundColor: "#F5F5F7" }}
+      style={{ backgroundColor: "#FFFFFF" }}
     >
       <div
         className="px-4 md:px-8"

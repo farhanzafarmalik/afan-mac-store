@@ -24,6 +24,7 @@ import {
   type ProductInput,
   type SavedItem,
 } from "@/lib/shopUtils";
+import type { Product } from "@/data/products";
 
 // ---------------------------------------------------------------------------
 // localStorage keys — IMPLEMENTATION_LOCK §1 §2
@@ -40,7 +41,8 @@ const MAX_QTY = 9;
 interface ShopState {
   savedItems: SavedItem[];
   cartItems: CartItem[];
-  activeDrawer: "saved" | "cart" | null;
+  activeDrawer: "saved" | "cart" | "details" | null;
+  detailsProduct: Product | null;
   hydrated: boolean;
 }
 
@@ -56,12 +58,14 @@ type ShopAction =
   | { type: "MOVE_TO_CART"; id: string }
   | { type: "OPEN_SAVED_DRAWER" }
   | { type: "OPEN_CART_DRAWER" }
+  | { type: "OPEN_DETAILS_DRAWER"; product: Product }
   | { type: "CLOSE_DRAWERS" };
 
 const initialState: ShopState = {
   savedItems: [],
   cartItems: [],
   activeDrawer: null,
+  detailsProduct: null,
   hydrated: false,
 };
 
@@ -205,8 +209,10 @@ function reducer(state: ShopState, action: ShopAction): ShopState {
       return { ...state, activeDrawer: "saved" };
     case "OPEN_CART_DRAWER":
       return { ...state, activeDrawer: "cart" };
+    case "OPEN_DETAILS_DRAWER":
+      return { ...state, activeDrawer: "details", detailsProduct: action.product };
     case "CLOSE_DRAWERS":
-      return { ...state, activeDrawer: null };
+      return { ...state, activeDrawer: null, detailsProduct: null };
 
     default:
       return state;
@@ -243,7 +249,8 @@ function writeStorage(key: string, value: unknown): void {
 interface ShopActionsContextValue {
   savedItems: SavedItem[];
   cartItems: CartItem[];
-  activeDrawer: "saved" | "cart" | null;
+  activeDrawer: "saved" | "cart" | "details" | null;
+  detailsProduct: Product | null;
   hydrated: boolean;
   savedCount: number;
   cartCount: number;
@@ -258,6 +265,7 @@ interface ShopActionsContextValue {
   moveSavedToCart: (id: string) => void;
   openSavedDrawer: () => void;
   openCartDrawer: () => void;
+  openDetailsDrawer: (product: Product) => void;
   closeDrawers: () => void;
 }
 
@@ -276,6 +284,17 @@ export function ShopActionsProvider({ children }: { children: ReactNode }) {
     const cartItems = readStorage<CartItem[]>(CART_KEY, []);
     dispatch({ type: "HYDRATE", savedItems, cartItems });
   }, []);
+
+  // Centralised body scroll lock — single source of truth for all drawers.
+  // Prevents race conditions when transitioning between drawer types
+  // (e.g. Details → Cart where per-drawer cleanups could clear each other).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    document.body.style.overflow = state.activeDrawer !== null ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [state.activeDrawer]);
 
   // Persist on change, but only after initial hydration
   useEffect(() => {
@@ -324,6 +343,10 @@ export function ShopActionsProvider({ children }: { children: ReactNode }) {
     () => dispatch({ type: "OPEN_CART_DRAWER" }),
     []
   );
+  const openDetailsDrawer = useCallback(
+    (product: Product) => dispatch({ type: "OPEN_DETAILS_DRAWER", product }),
+    []
+  );
   const closeDrawers = useCallback(
     () => dispatch({ type: "CLOSE_DRAWERS" }),
     []
@@ -334,6 +357,7 @@ export function ShopActionsProvider({ children }: { children: ReactNode }) {
       savedItems: state.savedItems,
       cartItems: state.cartItems,
       activeDrawer: state.activeDrawer,
+      detailsProduct: state.detailsProduct,
       hydrated: state.hydrated,
       savedCount: state.savedItems.length,
       cartCount: state.cartItems.length,
@@ -348,12 +372,14 @@ export function ShopActionsProvider({ children }: { children: ReactNode }) {
       moveSavedToCart,
       openSavedDrawer,
       openCartDrawer,
+      openDetailsDrawer,
       closeDrawers,
     }),
     [
       state.savedItems,
       state.cartItems,
       state.activeDrawer,
+      state.detailsProduct,
       state.hydrated,
       toggleSaved,
       removeSaved,
@@ -365,6 +391,7 @@ export function ShopActionsProvider({ children }: { children: ReactNode }) {
       moveSavedToCart,
       openSavedDrawer,
       openCartDrawer,
+      openDetailsDrawer,
       closeDrawers,
     ]
   );

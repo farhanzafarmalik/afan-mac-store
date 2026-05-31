@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SavedDrawer from "@/components/SavedDrawer";
 import CartInquiryDrawer from "@/components/CartInquiryDrawer";
+import ProductQuickDetailsDrawer from "@/components/ProductQuickDetailsDrawer";
 import { ShopActionsProvider } from "@/context/ShopActionsContext";
 
 const inter = Inter({
@@ -32,6 +33,7 @@ export default function RootLayout({
           {children}
           <SavedDrawer />
           <CartInquiryDrawer />
+          <ProductQuickDetailsDrawer />
           <Footer />
         </ShopActionsProvider>
       </body>

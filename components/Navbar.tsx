@@ -272,7 +272,7 @@ export default function Navbar() {
               href={whatsappLink(WHATSAPP_MSG)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex min-h-[44px] items-center rounded-full border-[1.5px] border-[#25D366] px-4 text-[14px] font-medium text-[#25D366] transition-colors duration-200 hover:bg-[rgba(37,211,102,0.08)] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)]"
+              className="flex min-h-[44px] items-center rounded-full border-[1.5px] border-[#25D366] px-4 text-[15px] font-medium text-[#25D366] transition-colors duration-200 hover:bg-[rgba(37,211,102,0.08)] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)]"
             >
               Buy on WhatsApp
             </a>
