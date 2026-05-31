@@ -1,26 +1,102 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* ─── Font Families ─── */
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Geist", sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Geist", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+
+  /* ─── Colors: Background & Surface ─── */
+  --color-bg: #F5F5F7;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F9F9F9;
+  --color-dark-bg: #000000;
+  --color-dark-surface: #1C1C1E;
+  --color-dark-surface-2: #2C2C2E;
+
+  /* ─── Colors: Text ─── */
+  --color-text-primary: #1D1D1F;
+  --color-text-secondary: #6E6E73;
+  --color-text-tertiary: #AEAEB2;
+  --color-text-inverse: #F5F5F7;
+  --color-text-inverse-2: #98989D;
+  --color-text-link: #0071E3;
+
+  /* ─── Colors: Border ─── */
+  --color-border: #D2D2D7;
+  --color-border-light: #E8E8ED;
+  --color-border-dark: #38383A;
+  --color-border-focus: #0071E3;
+
+  /* ─── Colors: Accent ─── */
+  --color-accent: #0071E3;
+  --color-accent-hover: #0077ED;
+  --color-accent-active: #005BB5;
+  --color-accent-subtle: #E8F1FC;
+
+  /* ─── Colors: Status ─── */
+  --color-success: #34C759;
+  --color-warning: #FF9500;
+  --color-error: #FF3B30;
+  --color-whatsapp: #25D366;
+  --color-whatsapp-hover: #1DAE56;
+
+  /* ─── Border Radius ─── */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ─── Box Shadows ─── */
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 10px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.09);
+  --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.10);
+  --shadow-focus: 0 0 0 3px rgba(0, 113, 227, 0.35);
+
+  /* ─── Animation Durations ─── */
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-medium: 300ms;
+  --duration-slow: 500ms;
+  --duration-cinematic: 800ms;
+  --duration-stagger: 80ms;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ─── Base ─── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100%;
+  background-color: #F5F5F7;
+  color: #1D1D1F;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── prefers-reduced-motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
