@@ -83,12 +83,24 @@ body {
   min-height: 100%;
   overflow-x: hidden;
   background-color: #F5F5F7;
+  /* Smooth scroll for same-page hash navigation */
+  scroll-behavior: smooth;
   color: #1D1D1F;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
   font-size: 17px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Anchor scroll offset — fixed navbar compensation ───
+   Navbar: 56px mobile (h-14) / 64px desktop (md:h-16) + 16px breathing room = 80px.
+   Prevents fixed header from covering section headings on hash navigation.
+   ─────────────────────────────────────────────────────── */
+#reviews,
+#location,
+#contact {
+  scroll-margin-top: 80px;
 }
 
 /* ─── prefers-reduced-motion ─── */

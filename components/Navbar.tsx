@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X, Heart, ShoppingBag, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -63,6 +64,8 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [productsExpanded, setProductsExpanded] = useState(false);
+
+  const pathname = usePathname();
 
   const menuRef = useRef<HTMLDivElement>(null);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
@@ -157,6 +160,72 @@ export default function Navbar() {
     setMobileOpen(false);
     setProductsExpanded(false);
   };
+
+  /**
+   * Unified nav-link click handler.
+   *
+   * Same-page anchors (/#reviews, /#location, /#contact) on the homepage:
+   *   Prevent default, close menu, then scroll after body.overflow clears.
+   *   When the mobile menu is open, body.overflow="hidden" blocks browser
+   *   anchor scroll — we wait ~50 ms after calling closeMobileMenu() so the
+   *   React overflow-lock effect has time to run before we scrollIntoView.
+   *
+   * Cross-page anchors (from /products → /#reviews) on mobile:
+   *   Prevent default, close menu, then force a full navigation after the
+   *   lock clears so the homepage renders and scrolls to the hash natively.
+   *
+   * Home ("/") on the homepage: scroll to top (Next.js won't re-navigate
+   *   same route).
+   *
+   * Everything else: let Next.js Link handle navigation; just close menu.
+   */
+  const handleLinkClick = useCallback(
+    (href: string, e: React.MouseEvent) => {
+      const isAnchorLink = href.startsWith("/#");
+      const targetId = isAnchorLink ? href.slice(2) : null;
+      const lockDelay = mobileOpen ? 50 : 0;
+
+      // ── Home on homepage ──
+      if (href === "/" && pathname === "/") {
+        e.preventDefault();
+        closeMobileMenu();
+        if (lockDelay) {
+          setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), lockDelay);
+        } else {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+        return;
+      }
+
+      // ── Anchor link while on the homepage ──
+      if (isAnchorLink && pathname === "/") {
+        e.preventDefault();
+        closeMobileMenu();
+        setTimeout(() => {
+          document.getElementById(targetId!)?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }, lockDelay);
+        return;
+      }
+
+      // ── Anchor link from a different route, mobile menu open ──
+      // Close the menu first so overflow clears, then do a full navigation.
+      if (isAnchorLink && mobileOpen) {
+        e.preventDefault();
+        closeMobileMenu();
+        setTimeout(() => {
+          window.location.href = href;
+        }, lockDelay);
+        return;
+      }
+
+      // ── Default: let Next.js Link navigate; close menu ──
+      closeMobileMenu();
+    },
+    [pathname, mobileOpen]
+  );
 
   const handleMobileSaved = () => {
     closeMobileMenu();
@@ -256,6 +325,7 @@ export default function Navbar() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
+                    onClick={(e) => handleLinkClick(link.href, e)}
                     className="text-[14px] text-[#1D1D1F] transition-colors duration-150 hover:text-[#0071E3] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)] rounded-sm"
                   >
                     {link.label}
@@ -415,7 +485,7 @@ export default function Navbar() {
                     >
                       <Link
                         href={link.href}
-                        onClick={closeMobileMenu}
+                        onClick={(e) => handleLinkClick(link.href, e)}
                         className="flex min-h-[52px] items-center py-4 text-[20px] font-medium text-[#1D1D1F] transition-colors duration-150 hover:text-[#0071E3] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)] rounded-sm"
                       >
                         {link.label}
