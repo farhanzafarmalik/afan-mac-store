@@ -56,6 +56,25 @@ export function getCartMode(categorySlug: string): CartMode {
 // WhatsApp message builders
 // ---------------------------------------------------------------------------
 
+/** Delivery details collected for accessories COD orders (component state only — never persisted). */
+export interface DeliveryDetails {
+  name: string;
+  phone: string;
+  city: string;
+  address: string;
+  notes: string;
+}
+
+/** Returns true when all required delivery fields are filled. */
+export function isDeliveryComplete(d: DeliveryDetails): boolean {
+  return (
+    d.name.trim().length > 0 &&
+    d.phone.trim().length > 0 &&
+    d.city.trim().length > 0 &&
+    d.address.trim().length > 0
+  );
+}
+
 /** Message for the Saved drawer "Send Saved List on WhatsApp" CTA. */
 export function buildSavedMessage(savedItems: SavedItem[]): string {
   if (savedItems.length === 0) return "";
@@ -69,41 +88,61 @@ export function buildSavedMessage(savedItems: SavedItem[]): string {
   );
 }
 
-/** Message for the Inquiry Bag "Send on WhatsApp" CTA. */
-export function buildInquiryMessage(cartItems: CartItem[]): string {
+/** Message for the Inquiry Bag CTA. Accepts optional delivery details for accessories. */
+export function buildInquiryMessage(
+  cartItems: CartItem[],
+  delivery?: DeliveryDetails
+): string {
   if (cartItems.length === 0) return "";
 
   const devices = cartItems.filter((i) => i.productType === "device");
   const accessories = cartItems.filter((i) => i.productType === "accessory");
   const lines: string[] = [];
 
+  const deliveryBlock =
+    delivery && isDeliveryComplete(delivery)
+      ? [
+          "\nDelivery Details:",
+          `Name: ${delivery.name.trim()}`,
+          `Phone: ${delivery.phone.trim()}`,
+          `City: ${delivery.city.trim()}`,
+          `Address: ${delivery.address.trim()}`,
+          ...(delivery.notes.trim() ? [`Notes: ${delivery.notes.trim()}`] : []),
+        ]
+      : [];
+
   if (devices.length > 0 && accessories.length > 0) {
-    lines.push("Hi Afan Mac Store, I want to inquire/order the following items:");
-    lines.push("\nDevice inquiries:");
-    devices.forEach((item, i) => lines.push(`${i + 1}. ${item.name}`));
-    lines.push("\nAccessories (COD):");
-    accessories.forEach((item, i) =>
-      lines.push(`${i + 1}. ${item.name} x ${item.quantity}`)
-    );
+    lines.push("Hi Afan Mac Store, I have two requests:");
+    lines.push("\nDevice Inquiry:");
+    devices.forEach((item, i) => lines.push(`${i + 1}. ${item.name} (×1)`));
     lines.push(
-      "\nPlease confirm current availability, condition, price, and COD delivery details for accessories."
+      "Please confirm availability, condition, price, and warranty/checking period."
+    );
+    lines.push("\nCOD Accessory Order:");
+    accessories.forEach((item, i) =>
+      lines.push(`${i + 1}. ${item.name} (×${item.quantity})`)
+    );
+    lines.push(...deliveryBlock);
+    lines.push(
+      "\nPlease confirm final price, delivery charges, and availability on WhatsApp. Thank you."
     );
   } else if (devices.length > 0) {
+    lines.push("Hi Afan Mac Store, I’d like to inquire about:");
+    lines.push("\nDevices:");
+    devices.forEach((item, i) => lines.push(`${i + 1}. ${item.name} (×1)`));
     lines.push(
-      "Hi Afan Mac Store, I want to inquire about the following Apple products:"
+      "\nPlease confirm availability, condition, price, and warranty/checking period for each. Thank you."
     );
-    lines.push("\nDevice inquiries:");
-    devices.forEach((item, i) => lines.push(`${i + 1}. ${item.name}`));
-    lines.push("\nPlease confirm current availability, condition, and price.");
   } else {
-    lines.push(
-      "Hi Afan Mac Store, I want to order the following accessories via COD:"
-    );
+    lines.push("Hi Afan Mac Store, I’d like to place a COD order:");
     lines.push("\nAccessories:");
     accessories.forEach((item, i) =>
-      lines.push(`${i + 1}. ${item.name} x ${item.quantity}`)
+      lines.push(`${i + 1}. ${item.name} (×${item.quantity})`)
     );
-    lines.push("\nPlease confirm availability, price, and COD delivery details.");
+    lines.push(...deliveryBlock);
+    lines.push(
+      "\nPlease confirm final price, delivery charges, and availability on WhatsApp. Thank you."
+    );
   }
 
   return lines.join("\n");

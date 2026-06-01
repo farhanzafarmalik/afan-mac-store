@@ -1,15 +1,23 @@
 "use client";
 
 // ---------------------------------------------------------------------------
-// components/CartInquiryDrawer.tsx — Phase 12B
+// components/CartInquiryDrawer.tsx — Phase 21B
 // ---------------------------------------------------------------------------
 // Right-side drawer for the Inquiry Bag (devices + accessories).
-// IMPLEMENTATION_LOCK §6  — device badge: "Inquiry item"
-// IMPLEMENTATION_LOCK §6  — accessory badge: "Accessory item" (never "COD accessory")
-// IMPLEMENTATION_LOCK §11 — final CTA: "Send on WhatsApp" (never "Checkout")
+//
+// Bag modes:
+//   Devices only   → no delivery form  · CTA: "Send Inquiry on WhatsApp"
+//   Accessories    → delivery form     · CTA: "Send Order Details on WhatsApp"
+//   Mixed          → delivery form     · CTA: "Send Inquiry & Order Details on WhatsApp"
+//
+// RULES (never violate):
+//   - No checkout, no payment, no "Place Order", no "Pay Now", no "Buy Now"
+//   - Delivery details live in component state only — never localStorage
+//   - Final action is WhatsApp — wa.me/923133388666
+//   - Device inquiry flow unchanged
 // ---------------------------------------------------------------------------
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Headphones,
@@ -29,7 +37,12 @@ import {
 } from "lucide-react";
 import { useShopActions } from "@/context/ShopActionsContext";
 import { whatsappLink } from "@/lib/constants";
-import { buildInquiryMessage, type CartItem } from "@/lib/shopUtils";
+import {
+  buildInquiryMessage,
+  isDeliveryComplete,
+  type CartItem,
+  type DeliveryDetails,
+} from "@/lib/shopUtils";
 
 // ---------------------------------------------------------------------------
 // Icon map
@@ -51,6 +64,18 @@ function getIcon(slug: string): LucideIcon {
 }
 
 // ---------------------------------------------------------------------------
+// Empty delivery state
+// ---------------------------------------------------------------------------
+
+const EMPTY_DELIVERY: DeliveryDetails = {
+  name: "",
+  phone: "",
+  city: "",
+  address: "",
+  notes: "",
+};
+
+// ---------------------------------------------------------------------------
 // CartInquiryDrawer
 // ---------------------------------------------------------------------------
 
@@ -68,7 +93,21 @@ export default function CartInquiryDrawer() {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
 
-  // Focus management
+  // Delivery details — component memory only, never persisted to localStorage.
+  // Component is always mounted (AnimatePresence is internal), so state
+  // persists across open/close cycles within the same page session.
+  const [delivery, setDelivery] = useState<DeliveryDetails>(EMPTY_DELIVERY);
+
+  const updateDelivery = useCallback(
+    (field: keyof DeliveryDetails, value: string) => {
+      setDelivery((prev) => ({ ...prev, [field]: value }));
+    },
+    []
+  );
+
+  const resetDelivery = useCallback(() => setDelivery(EMPTY_DELIVERY), []);
+
+  // ── Focus management ──
   useEffect(() => {
     if (isOpen) {
       triggerRef.current = document.activeElement as HTMLElement;
@@ -80,7 +119,7 @@ export default function CartInquiryDrawer() {
     }
   }, [isOpen]);
 
-  // Escape key
+  // ── Escape key ──
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -90,13 +129,42 @@ export default function CartInquiryDrawer() {
     return () => document.removeEventListener("keydown", onKey);
   }, [isOpen, closeDrawers]);
 
-  // Body scroll lock is managed centrally in ShopActionsContext.
+  // Body scroll lock managed centrally in ShopActionsContext.
 
+  // ── Derived state ──
   const devices = cartItems.filter((i) => i.productType === "device");
   const accessories = cartItems.filter((i) => i.productType === "accessory");
   const showSections = devices.length > 0 && accessories.length > 0;
   const hasItems = cartItems.length > 0;
-  const waMessage = buildInquiryMessage(cartItems);
+  const hasAccessories = accessories.length > 0;
+  const formComplete = !hasAccessories || isDeliveryComplete(delivery);
+  const ctaEnabled = hasItems && formComplete;
+
+  // CTA label adapts to bag composition
+  const ctaLabel =
+    devices.length > 0 && accessories.length > 0
+      ? "Send Inquiry & Order Details on WhatsApp"
+      : accessories.length > 0
+      ? "Send Order Details on WhatsApp"
+      : "Send Inquiry on WhatsApp";
+
+  // Build WhatsApp message — includes delivery details when accessories present
+  const waMessage = buildInquiryMessage(
+    cartItems,
+    hasAccessories ? delivery : undefined
+  );
+
+  // ── Handlers ──
+  const handleClearAll = useCallback(() => {
+    clearCart();
+    resetDelivery();
+  }, [clearCart, resetDelivery]);
+
+  const handleSend = useCallback(() => {
+    if (!ctaEnabled) return;
+    window.open(whatsappLink(waMessage), "_blank", "noopener,noreferrer");
+    resetDelivery();
+  }, [ctaEnabled, waMessage, resetDelivery]);
 
   return (
     <AnimatePresence>
@@ -204,13 +272,13 @@ export default function CartInquiryDrawer() {
               </button>
             </div>
 
-            {/* ── Item list ── */}
+            {/* ── Scrollable body ── */}
             <div
               style={{
                 flex: 1,
                 overflowY: "auto",
                 overflowX: "hidden",
-                padding: "8px 0",
+                padding: "8px 0 0",
               }}
             >
               {!hasItems ? (
@@ -278,6 +346,14 @@ export default function CartInquiryDrawer() {
                       ))}
                     </>
                   )}
+
+                  {/* Delivery Details form — only when accessories present */}
+                  {hasAccessories && (
+                    <DeliveryForm
+                      details={delivery}
+                      onChange={updateDelivery}
+                    />
+                  )}
                 </>
               )}
             </div>
@@ -287,15 +363,32 @@ export default function CartInquiryDrawer() {
               style={{
                 flexShrink: 0,
                 borderTop: "1px solid #E8E8ED",
-                padding: "16px 20px",
+                padding: "12px 20px 16px",
                 display: "flex",
                 flexDirection: "column",
-                gap: 10,
+                gap: 8,
               }}
             >
+              {/* Helper text — shown only when accessories present and form incomplete */}
+              {hasAccessories && !formComplete && (
+                <p
+                  aria-live="polite"
+                  style={{
+                    fontSize: 12,
+                    color: "#6E6E73",
+                    letterSpacing: "normal",
+                    margin: 0,
+                    lineHeight: 1.4,
+                  }}
+                >
+                  Fill in delivery details to continue.
+                </p>
+              )}
+
+              {/* Clear all */}
               {hasItems && (
                 <button
-                  onClick={clearCart}
+                  onClick={handleClearAll}
                   aria-label="Clear all items from Inquiry Bag"
                   style={{
                     background: "none",
@@ -304,7 +397,7 @@ export default function CartInquiryDrawer() {
                     fontSize: 13,
                     color: "#AEAEB2",
                     letterSpacing: "normal",
-                    padding: "4px 0",
+                    padding: "2px 0",
                     textAlign: "left",
                   }}
                   className="hover:text-[#6E6E73] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)] rounded-sm"
@@ -313,35 +406,38 @@ export default function CartInquiryDrawer() {
                 </button>
               )}
 
-              {/* IMPLEMENTATION_LOCK §11 §12 — "Send on WhatsApp" not "Checkout" */}
-              <a
-                href={hasItems ? whatsappLink(waMessage) : undefined}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Send inquiry on WhatsApp"
-                aria-disabled={!hasItems}
-                onClick={!hasItems ? (e) => e.preventDefault() : undefined}
+              {/* WhatsApp CTA — button with proper disabled attribute */}
+              <button
+                onClick={handleSend}
+                disabled={!ctaEnabled}
+                aria-label={ctaLabel}
+                aria-describedby={
+                  hasAccessories && !formComplete
+                    ? "delivery-helper"
+                    : undefined
+                }
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   gap: 8,
                   minHeight: 52,
+                  width: "100%",
                   borderRadius: 9999,
-                  backgroundColor: hasItems ? "#25D366" : "#D2D2D7",
+                  border: "none",
+                  backgroundColor: "#25D366",
                   color: "#FFFFFF",
-                  fontSize: 16,
-                  fontWeight: 500,
+                  fontSize: 15,
+                  fontWeight: 600,
                   letterSpacing: "normal",
-                  textDecoration: "none",
-                  pointerEvents: hasItems ? "auto" : "none",
-                  cursor: hasItems ? "pointer" : "default",
-                  transition: "background-color 0.15s ease",
+                  cursor: ctaEnabled ? "pointer" : "not-allowed",
+                  opacity: ctaEnabled ? 1 : 0.45,
+                  transition: "opacity 0.15s ease, background-color 0.15s ease",
                 }}
                 className={
-                  hasItems
+                  ctaEnabled
                     ? "hover:bg-[#1DAE56] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)]"
-                    : undefined
+                    : "focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)]"
                 }
               >
                 <MessageCircle
@@ -350,8 +446,8 @@ export default function CartInquiryDrawer() {
                   focusable="false"
                   strokeWidth={2}
                 />
-                Send on WhatsApp
-              </a>
+                {ctaLabel}
+              </button>
             </div>
           </motion.div>
         </>
@@ -397,8 +493,6 @@ function CartItemRow({
 }) {
   const Icon = getIcon(item.categorySlug);
   const isAccessory = item.productType === "accessory";
-
-  // IMPLEMENTATION_LOCK §6 §7 — "Accessory item" not "COD accessory"
   const badgeLabel = isAccessory ? "Accessory item" : "Inquiry item";
 
   return (
@@ -483,10 +577,9 @@ function CartItemRow({
             {badgeLabel}
           </span>
 
-          {/* Accessory quantity controls — 44×44 tap target, 28×28 visual circle */}
+          {/* Accessory quantity controls */}
           {isAccessory ? (
             <div style={{ display: "flex", alignItems: "center" }}>
-              {/* Decrease — 44×44 clickable, 28×28 visual */}
               <button
                 onClick={() => onUpdateQty(item.id, item.quantity - 1)}
                 aria-label={`Decrease quantity of ${item.name}`}
@@ -536,7 +629,6 @@ function CartItemRow({
                 {item.quantity}
               </span>
 
-              {/* Increase — 44×44 clickable, 28×28 visual */}
               <button
                 onClick={() => onUpdateQty(item.id, item.quantity + 1)}
                 aria-label={`Increase quantity of ${item.name}`}
@@ -574,7 +666,6 @@ function CartItemRow({
               </button>
             </div>
           ) : (
-            /* Device — fixed qty 1, no controls */
             <span
               style={{
                 fontSize: 12,
@@ -588,7 +679,7 @@ function CartItemRow({
         </div>
       </div>
 
-      {/* Remove button — 44×44 tap target */}
+      {/* Remove button */}
       <button
         onClick={() => onRemove(item.id)}
         aria-label={`Remove ${item.name} from Inquiry Bag`}
@@ -612,3 +703,198 @@ function CartItemRow({
     </div>
   );
 }
+
+// ---------------------------------------------------------------------------
+// DeliveryForm
+// ---------------------------------------------------------------------------
+
+function DeliveryForm({
+  details,
+  onChange,
+}: {
+  details: DeliveryDetails;
+  onChange: (field: keyof DeliveryDetails, value: string) => void;
+}) {
+  return (
+    <div
+      style={{
+        padding: "16px 20px 20px",
+        borderTop: "1px solid #E8E8ED",
+        marginTop: 8,
+      }}
+    >
+      {/* Section label */}
+      <p
+        style={{
+          fontSize: 13,
+          fontWeight: 600,
+          color: "#1D1D1F",
+          letterSpacing: "normal",
+          margin: "0 0 14px",
+          lineHeight: 1.3,
+        }}
+      >
+        Delivery Details
+      </p>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {/* Full name */}
+        <FieldGroup
+          id="delivery-name"
+          label="Full name"
+          required
+        >
+          <input
+            id="delivery-name"
+            type="text"
+            value={details.name}
+            onChange={(e) => onChange("name", e.target.value)}
+            placeholder="Your full name"
+            required
+            aria-required="true"
+            autoComplete="name"
+            style={inputStyle}
+            className={inputClass}
+          />
+        </FieldGroup>
+
+        {/* Phone */}
+        <FieldGroup
+          id="delivery-phone"
+          label="WhatsApp / phone number"
+          required
+        >
+          <input
+            id="delivery-phone"
+            type="tel"
+            value={details.phone}
+            onChange={(e) => onChange("phone", e.target.value)}
+            placeholder="03XX-XXXXXXX"
+            required
+            aria-required="true"
+            autoComplete="tel"
+            style={inputStyle}
+            className={inputClass}
+          />
+        </FieldGroup>
+
+        {/* City */}
+        <FieldGroup id="delivery-city" label="City" required>
+          <input
+            id="delivery-city"
+            type="text"
+            value={details.city}
+            onChange={(e) => onChange("city", e.target.value)}
+            placeholder="e.g. Rawalpindi, Lahore"
+            required
+            aria-required="true"
+            autoComplete="address-level2"
+            style={inputStyle}
+            className={inputClass}
+          />
+        </FieldGroup>
+
+        {/* Address */}
+        <FieldGroup
+          id="delivery-address"
+          label="Complete delivery address"
+          required
+        >
+          <textarea
+            id="delivery-address"
+            value={details.address}
+            onChange={(e) => onChange("address", e.target.value)}
+            placeholder="Street, area, landmark…"
+            required
+            aria-required="true"
+            autoComplete="street-address"
+            rows={3}
+            style={{ ...inputStyle, resize: "vertical", lineHeight: 1.5 }}
+            className={inputClass}
+          />
+        </FieldGroup>
+
+        {/* Notes — optional */}
+        <FieldGroup id="delivery-notes" label="Order notes" optional>
+          <textarea
+            id="delivery-notes"
+            value={details.notes}
+            onChange={(e) => onChange("notes", e.target.value)}
+            placeholder="Any special instructions (optional)"
+            rows={2}
+            style={{ ...inputStyle, resize: "vertical", lineHeight: 1.5 }}
+            className={inputClass}
+          />
+        </FieldGroup>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// FieldGroup — label + input wrapper
+// ---------------------------------------------------------------------------
+
+function FieldGroup({
+  id,
+  label,
+  required,
+  optional,
+  children,
+}: {
+  id: string;
+  label: string;
+  required?: boolean;
+  optional?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <label
+        htmlFor={id}
+        style={{
+          fontSize: 12,
+          fontWeight: 500,
+          color: "#6E6E73",
+          letterSpacing: "normal",
+          lineHeight: 1.3,
+        }}
+      >
+        {label}
+        {required && (
+          <span aria-hidden="true" style={{ color: "#FF3B30", marginLeft: 2 }}>
+            *
+          </span>
+        )}
+        {optional && (
+          <span style={{ color: "#AEAEB2", marginLeft: 4, fontWeight: 400 }}>
+            (optional)
+          </span>
+        )}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Shared input styles
+// ---------------------------------------------------------------------------
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  minHeight: 44,
+  padding: "10px 12px",
+  fontSize: 14,
+  color: "#1D1D1F",
+  backgroundColor: "#FFFFFF",
+  border: "1.5px solid #D2D2D7",
+  borderRadius: 12,
+  outline: "none",
+  fontFamily: "inherit",
+  letterSpacing: "normal",
+  boxSizing: "border-box",
+};
+
+const inputClass =
+  "focus:border-[#0071E3] focus:shadow-[0_0_0_3px_rgba(0,113,227,0.35)] placeholder:text-[#AEAEB2]";
