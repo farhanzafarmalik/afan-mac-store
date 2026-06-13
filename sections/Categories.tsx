@@ -224,16 +224,32 @@ export default function Categories() {
             >
               Shop by Category
             </p>
-            <h2
-              id="categories-heading"
-              className="font-semibold text-[#1D1D1F] leading-[1.08] tracking-[-0.02em]"
-              style={{
-                fontSize: "clamp(1.75rem, 3.5vw + 0.25rem, 3rem)",
-                maxWidth: "560px",
-              }}
-            >
-              Find your next Apple device.
-            </h2>
+            <div className="flex items-end justify-between gap-4">
+              <h2
+                id="categories-heading"
+                className="font-semibold text-[#1D1D1F] leading-[1.08] tracking-[-0.02em]"
+                style={{
+                  fontSize: "clamp(1.75rem, 3.5vw + 0.25rem, 3rem)",
+                  maxWidth: "560px",
+                }}
+              >
+                Find your next Apple device.
+              </h2>
+              {/* Mobile-only swipe hint — hidden on md+ where arrows are visible */}
+              <span
+                className="md:hidden flex-shrink-0 self-end"
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  color: "#6E6E73",
+                  paddingBottom: "4px",
+                  whiteSpace: "nowrap",
+                }}
+                aria-hidden="true"
+              >
+                Swipe to browse →
+              </span>
+            </div>
           </div>
 
           {/* ── Strip row: [left arrow] [scroll container] [right arrow] ── */}
