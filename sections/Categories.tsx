@@ -64,37 +64,41 @@ function CategoryItem({
     >
       <Link
         href={category.slug}
-        aria-label={`Browse ${category.name}`}
-        className="flex flex-col items-center gap-[10px] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)] rounded-[12px]"
-        style={{ width: 96, textDecoration: "none" }}
+        aria-label={`Shop ${category.name}`}
+        className="flex flex-col items-center gap-[10px] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)] rounded-[12px] active:scale-[0.97] transition-transform duration-100"
+        style={{ width: 104, textDecoration: "none" }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
         {/* ── Icon tile ── */}
         <div
           style={{
-            width: 72,
-            height: 72,
+            width: 76,
+            height: 76,
             borderRadius: 18,
             background: "#FFFFFF",
-            border: "1px solid #E8E8ED",
+            border: `1px solid ${hovered ? "#D2D2D7" : "#E8E8ED"}`,
             boxShadow: hovered
-              ? "0 2px 10px rgba(0,0,0,0.07)"
+              ? "0 4px 12px rgba(0,0,0,0.09)"
               : "0 1px 4px rgba(0,0,0,0.05)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            transform: hovered ? "translateY(-2px)" : "translateY(0)",
-            transition: "transform 0.2s ease, box-shadow 0.2s ease",
+            transform: hovered ? "translateY(-3px)" : "translateY(0)",
+            transition:
+              "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
           }}
         >
           {Icon && (
             <Icon
-              size={34}
-              color="#6E6E73"
+              size={36}
+              strokeWidth={1.75}
               aria-hidden="true"
               focusable="false"
-              strokeWidth={1.5}
+              style={{
+                color: hovered ? "#0071E3" : "#6E6E73",
+                transition: "color 0.2s ease",
+              }}
             />
           )}
         </div>
@@ -103,7 +107,7 @@ function CategoryItem({
         <span
           style={{
             fontSize: "13px",
-            fontWeight: 600,
+            fontWeight: 500,
             color: "#1D1D1F",
             textAlign: "center",
             lineHeight: 1.25,
@@ -233,40 +237,68 @@ export default function Categories() {
           </div>
 
           {/* ── Strip row: [left arrow] [scroll container] [right arrow] ── */}
+          {/* Arrows are desktop-only; mobile uses touch-swipe with a gradient fade hint */}
           <div className="flex items-center gap-3">
 
-            <ArrowButton
-              direction="left"
-              visible={canScrollLeft}
-              onClick={() => handleScroll("left")}
-            />
+            <div className="hidden md:flex">
+              <ArrowButton
+                direction="left"
+                visible={canScrollLeft}
+                onClick={() => handleScroll("left")}
+              />
+            </div>
 
-            {/* Horizontal scroll strip — scrollbar hidden across all browsers */}
-            <div
-              ref={scrollRef}
-              className="flex-1 overflow-x-auto [&::-webkit-scrollbar]:hidden"
-              style={{ scrollbarWidth: "none" } as React.CSSProperties}
-            >
+            {/* Scroll container — relative so gradient fade can overlay on mobile */}
+            <div className="relative flex-1 min-w-0">
+              {/* Mobile right-edge fade: hints more content, never covers a tile */}
+              {canScrollRight && (
+                <div
+                  className="md:hidden pointer-events-none absolute right-0 top-0 bottom-0 w-10 z-10"
+                  style={{
+                    background:
+                      "linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.96))",
+                  }}
+                />
+              )}
+              {canScrollLeft && (
+                <div
+                  className="md:hidden pointer-events-none absolute left-0 top-0 bottom-0 w-6 z-10"
+                  style={{
+                    background:
+                      "linear-gradient(to left, rgba(255,255,255,0), rgba(255,255,255,0.96))",
+                  }}
+                />
+              )}
+
+              {/* Horizontal scroll strip — scrollbar hidden across all browsers */}
               <div
-                className="flex"
-                style={{ gap: "clamp(12px, 2vw, 28px)", paddingBottom: "4px" }}
+                ref={scrollRef}
+                className="overflow-x-auto [&::-webkit-scrollbar]:hidden"
+                style={{ scrollbarWidth: "none" } as React.CSSProperties}
               >
-                {CATEGORIES.map((category, index) => (
-                  <CategoryItem
-                    key={category.slug}
-                    category={category}
-                    index={index}
-                    sectionInView={sectionInView}
-                  />
-                ))}
+                <div
+                  className="flex md:justify-center"
+                  style={{ gap: "clamp(12px, 2vw, 28px)", paddingBottom: "4px" }}
+                >
+                  {CATEGORIES.map((category, index) => (
+                    <CategoryItem
+                      key={category.slug}
+                      category={category}
+                      index={index}
+                      sectionInView={sectionInView}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
-            <ArrowButton
-              direction="right"
-              visible={canScrollRight}
-              onClick={() => handleScroll("right")}
-            />
+            <div className="hidden md:flex">
+              <ArrowButton
+                direction="right"
+                visible={canScrollRight}
+                onClick={() => handleScroll("right")}
+              />
+            </div>
 
           </div>
 
