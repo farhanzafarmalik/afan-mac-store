@@ -228,6 +228,45 @@ export default function ProductQuickDetailsDrawer() {
                 gap: 20,
               }}
             >
+              {/* ── Media zone ── */}
+              <div
+                style={{
+                  width: "100%",
+                  height: 200,
+                  background: "#F5F5F7",
+                  borderRadius: 12,
+                  overflow: "hidden",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                {product.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={product.image}
+                    alt={product.imageAlt ?? `${product.name} product image`}
+                    loading="lazy"
+                    draggable={false}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                      padding: 16,
+                    }}
+                  />
+                ) : (
+                  <Icon
+                    size={64}
+                    color="#6E6E73"
+                    aria-hidden="true"
+                    focusable="false"
+                    strokeWidth={1.25}
+                  />
+                )}
+              </div>
+
               {/* Category badge */}
               <div>
                 <span

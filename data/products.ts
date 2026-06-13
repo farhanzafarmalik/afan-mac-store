@@ -29,6 +29,8 @@ export interface Product {
   conditionLabel?: string;
   /** null until real local/licensed assets are ready */
   image: string | null;
+  /** Alt text for the product image. Required when image is set. */
+  imageAlt?: string;
   /** Pre-filled WhatsApp inquiry message */
   whatsappMessage: string;
   /** true if this product appears in homepage Featured Products strip */

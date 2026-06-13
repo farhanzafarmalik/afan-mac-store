@@ -151,7 +151,7 @@ export default function ProductCard({ product }: { product: Product }) {
         flexDirection: "column",
       }}
     >
-      {/* ── Visual area — icon placeholder + heart button ── */}
+      {/* ── Visual area — icon/image + drawer trigger + heart button ── */}
       <div
         style={{
           height: 176,
@@ -165,15 +165,48 @@ export default function ProductCard({ product }: { product: Product }) {
           position: "relative",
         }}
       >
-        <Icon
-          size={48}
-          color="#6E6E73"
-          aria-hidden="true"
-          focusable="false"
-          strokeWidth={1.5}
+        {/* Background button — opens drawer; sits below heart (z-index 0) */}
+        <button
+          onClick={() => openDetailsDrawer(product)}
+          aria-label={`View details for ${product.name}`}
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            zIndex: 0,
+          }}
+          className="focus-visible:outline-none focus-visible:shadow-[inset_0_0_0_3px_rgba(0,113,227,0.35)]"
         />
 
-        {/* Heart save button — 44×44 tap target, 28×28 visual circle */}
+        {product.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={product.image}
+            alt={product.imageAlt ?? `${product.name} product image`}
+            loading="lazy"
+            draggable={false}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              padding: 16,
+              pointerEvents: "none",
+            }}
+          />
+        ) : (
+          <Icon
+            size={48}
+            color="#6E6E73"
+            aria-hidden="true"
+            focusable="false"
+            strokeWidth={1.5}
+            style={{ pointerEvents: "none" }}
+          />
+        )}
+
+        {/* Heart save button — 44×44 tap target, z-index 1 keeps it above drawer trigger */}
         <button
           onClick={handleToggleSaved}
           aria-label={saved ? `Remove ${product.name} from saved` : `Save ${product.name}`}
@@ -241,17 +274,32 @@ export default function ProductCard({ product }: { product: Product }) {
         >
           <h3
             style={{
-              fontSize: 17,
-              fontWeight: 600,
-              color: "#1D1D1F",
-              lineHeight: 1.25,
-              letterSpacing: "normal",
               margin: 0,
-              // Reserve 2 lines so cards align across the grid
-              minHeight: "calc(1.25 * 2 * 17px)", // = 42.5px ≈ 2 lines
+              minHeight: "calc(1.25 * 2 * 17px)",
             }}
           >
-            {product.name}
+            <button
+              onClick={() => openDetailsDrawer(product)}
+              aria-label={`View details for ${product.name}`}
+              style={{
+                background: "transparent",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+                fontSize: 17,
+                fontWeight: 600,
+                color: "#1D1D1F",
+                lineHeight: 1.25,
+                letterSpacing: "normal",
+                textAlign: "left",
+                display: "block",
+                width: "100%",
+                transition: "color 0.15s ease",
+              }}
+              className="hover:text-[#0071E3] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)] rounded-[4px]"
+            >
+              {product.name}
+            </button>
           </h3>
           <span
             style={{
@@ -327,7 +375,7 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* ── "Details" text trigger ── */}
         <button
           onClick={() => openDetailsDrawer(product)}
-          aria-label={`View quick details for ${product.name}`}
+          aria-label={`View details for ${product.name}`}
           style={{
             alignSelf: "flex-start",
             background: "transparent",
@@ -344,7 +392,7 @@ export default function ProductCard({ product }: { product: Product }) {
           }}
           className="focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(0,113,227,0.35)] rounded hover:underline hover:[text-underline-offset:2px]"
         >
-          Quick details →
+          View details →
         </button>
 
         {/* ── Button row: Add to Inquiry/Cart + Ask on WhatsApp ── */}
